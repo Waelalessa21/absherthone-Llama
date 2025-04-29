@@ -14,16 +14,21 @@ async def analyze_chunk(user_input, chat_history):
     model = Ollama(model="llama3.2")
     response = await asyncio.to_thread(model.invoke, prompt)
     try:
-        data = json.loads(response) 
+        data = json.loads(response)
         classification = data.get("classification", "Unknown")
         notification_en = data.get("notification", "Unable to generate notification.")
         notification_ar = translate_to_arabic(notification_en)
         risk_score = float(data.get("risk_score", 0.5))
         risk_score = max(0.0, min(risk_score, 1.0))
+    except json.JSONDecodeError:
+        classification = "Unknown"
+        notification_en = "⚠️ The model returned an invalid response."
+        notification_ar = translate_to_arabic(notification_en)
+        risk_score = 0.5
     except Exception:
         classification = "Unknown"
         notification_en = "⚠️ Could not classify the message."
-        notification_ar = "⚠️ تعذر تصنيف الرسالة."
+        notification_ar = translate_to_arabic(notification_en)
         risk_score = 0.5
     return {
         "classification": classification.capitalize(),
