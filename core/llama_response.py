@@ -14,7 +14,7 @@ async def analyze_chunk(user_input, chat_history):
     model = Ollama(model="llama3.2")
     response = await asyncio.to_thread(model.invoke, prompt)
     try:
-        data = json.loads(response)
+        data = json.loads(response) 
         classification = data.get("classification", "Unknown")
         notification_en = data.get("notification", "Unable to generate notification.")
         notification_ar = translate_to_arabic(notification_en)
